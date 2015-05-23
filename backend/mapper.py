@@ -41,3 +41,7 @@ class DjangoMapper(Mapper):
         dictionary.
         """
         return u'{0}.{1}'.format(self.class_name, attribute.name)
+
+    @property
+    def reverse_mappings(self):
+        return dict((v, k) for k, v in self.mappings.items())

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models import get_model
+from django.db.models import Count, Max, Min, Sum, Avg
 
 from cubes.logging import get_logger
 from cubes.browser import AggregationBrowser, AggregationResult, Cell, Facts, PointCut
@@ -9,6 +10,39 @@ from .mapper import DjangoMapper
 
 
 __all__ = ['DjangoBrowser', ]
+
+
+_aggregate_functions = {
+    'count': {
+        'aggregate_fn': Count,
+    },
+    'sum': {
+        'aggregate_fn': Sum,
+    },
+    'max': {
+        'aggregate_fn': Max,
+    },
+    'min': {
+        'aggregate_fn': Min,
+    },
+    'avg': {
+        'aggregate_fn': Avg,
+    },
+}
+
+
+def get_aggregate_function(name):
+    """Returns an aggregate function `name`. The returned function takes two
+    arguments: `aggregate` and `context`. When called returns a labelled
+    SQL expression."""
+
+    name = name or "identity"
+    return _aggregate_functions[name]
+
+
+def available_aggregate_functions():
+    """Returns a list of available aggregate function names."""
+    return _aggregate_functions.keys()
 
 
 class DjangoBrowser(AggregationBrowser):
@@ -54,6 +88,7 @@ class DjangoBrowser(AggregationBrowser):
         self.exclude_null_agregates = options.get("exclude_null_agregates", True)
 
         self.mapper = DjangoMapper(self.cube, self.class_name, self.locale)
+        self.model = get_model(*self.class_name.split('.'))
 
     def features(self):
         """
@@ -64,17 +99,69 @@ class DjangoBrowser(AggregationBrowser):
 
         return {
             "actions": ["aggregate", "fact", "members", "facts", "cell"],
-            #"aggregate_functions": available_aggregate_functions(),
+            "aggregate_functions": available_aggregate_functions(),
             "post_aggregate_functions": available_calculators()
         }
 
     def is_builtin_function(self, function_name, aggregate):
-        """Returns `True` if function `function_name` for `aggregate` is
+        """
+        Returns `True` if function `function_name` for `aggregate` is
         bult-in. Returns `False` if the browser can not compute the function
         and post-aggregation calculation should be used.
+        """
+        return function_name in available_aggregate_functions()
 
-        Subclasses should override this method."""
-        return False
+    def _build_cell_cut_qset(self, cell):
+        filter_kwargs = {}
+        for cut in cell.cuts:
+            path = cut.path
+            depth = cut.level_depth()
+            dim = self.cube.dimension(cut.dimension)
+            hier = dim.hierarchy(cut.hierarchy)
+            keys = [level.key for level in hier[0:depth]]
+            for key in keys:
+                filter_kwargs[u'%s__in' % key.name] = path
+
+        return self.model.objects.filter(**filter_kwargs)
+
+    def build_query(self, cell, attributes, page=None, page_size=None, order=None, include_fact_key=False):
+        qset = self._build_cell_cut_qset(cell)
+        if order:
+            order_fields =  [item[0].name for item in order]
+            qset = qset.order_by(*order_fields)
+        if page and page_size:
+            start = (page - 1) * page_size
+            end = start + page_size
+            qset = qset[start:end]
+        return qset.values()
+
+    def build_aggregation(self, cell, aggregates, drilldown, summary_only=False):
+        filter_kwargs = {}
+        args, kwargs = [], {}
+        qset = self._build_cell_cut_qset(cell)
+
+        for item in aggregates:
+            measure = item.measure if item.measure else 'pk'
+            function = _aggregate_functions[item.function]['aggregate_fn']
+            kwargs[item.name] = function(measure)
+
+        if summary_only:
+            result = qset.aggregate(*args, **kwargs)
+        else:
+            args = [item.name for item in drilldown.all_attributes()]
+            result = qset.values(*args).annotate(**kwargs).order_by(*args)
+
+        return result
+
+    def result_iterator(self, cells):
+        result = []
+        for cell in cells:
+            new_cell = dict(
+                (self.mapper.reverse_mappings.get(k, k), v)
+                for k, v in cell.items()
+            )
+            result.append(new_cell)
+        return result
 
     def provide_aggregate(self, cell, aggregates, drilldown, split, order, page, page_size, **options):
         """
@@ -116,110 +203,56 @@ class DjangoBrowser(AggregationBrowser):
 
         * measures can be only in the fact table
         """
-
-        ## Da documentação:
-        #
-        # ... do the aggregation here ...
-        #
-
         result = AggregationResult(cell=cell, aggregates=aggregates)
-        import ipdb; ipdb.set_trace()
-
-        ## Set the result cells iterator (required)
-        #result.cells = ...
-        #result.labels = ...
-
-        ## Optional:
-        #result.total_cell_count = ...
-        #result.summary = ...
-
-        return result
-
-        ## Do backend sql
-        #result = AggregationResult(cell=cell, aggregates=aggregates)
 
         ## Summary
         ## -------
+        result.summary = self.build_aggregation(cell, aggregates, drilldown, summary_only=True)
 
-        #if self.include_summary or not (drilldown or split):
-        #    # TODO: Refazer isso para o orm do django
-        #    raise NotImplementedError
-        #    builder = QueryBuilder(self)
-        #    builder.aggregation_statement(
-        #        cell, aggregates=aggregates, drilldown=drilldown, summary_only=True
-        #    )
+        # Drill-down
+        # ----------
+        # Note that a split cell if present prepends the drilldown
+        if drilldown or split:
+            if not (page_size and page is not None):
+                self.assert_low_cardinality(cell, drilldown)
 
-        #    cursor = self.execute_statement(
-        #        builder.statement, "aggregation summary"
-        #    )
-        #    row = cursor.fetchone()
-        #    if row:
-        #        # Convert SQLAlchemy object into a dictionary
-        #        record = dict(zip(builder.labels, row))
-        #    else:
-        #        record = None
-        #    cursor.close()
-        #    result.summary = record
+            result.levels = drilldown.result_levels(include_split=bool(split))
+            self.logger.debug("preparing drilldown statement")
 
-        ## Drill-down
-        ## ----------
-        ##
-        ## Note that a split cell if present prepends the drilldown
-        #if drilldown or split:
-        #    if not (page_size and page is not None):
-        #        self.assert_low_cardinality(cell, drilldown)
+            #
+            # Find post-aggregation calculations and decorate the result
+            #
+            result.calculators = calculators_for_aggregates(
+                self.cube, aggregates, drilldown, split, available_aggregate_functions()
+            )
 
-        #    result.levels = drilldown.result_levels(include_split=bool(split))
-        #    self.logger.debug("preparing drilldown statement")
+            query = self.build_aggregation(cell, aggregates, drilldown)
+            result.cells = self.result_iterator(query)
+            if result.cells:
+                result.labels = result.cells[0].keys()
 
-        #    # TODO: Refazer isso para o orm do django
-        #    raise NotImplementedError
-        #    builder = QueryBuilder(self)
-        #    builder.aggregation_statement(
-        #        cell, drilldown=drilldown, aggregates=aggregates, split=split
-        #    )
-        #    builder.paginate(page, page_size)
-        #    builder.order(order)
+            if self.include_cell_count:
+                result.total_cell_count = query.count()
 
-        #    cursor = self.execute_statement(
-        #        builder.statement, "aggregation drilldown"
-        #    )
+        elif result.summary is not None:
+            # Do calculated measures on summary if no drilldown or split
+            # TODO: should not we do this anyway regardless of
+            # drilldown/split?
+            calculators = calculators_for_aggregates(
+                self.cube, aggregates, drilldown, split, available_aggregate_functions()
+            )
+            for calc in calculators:
+                calc(result.summary)
 
-        #    #
-        #    # Find post-aggregation calculations and decorate the result
-        #    #
-        #    result.calculators = calculators_for_aggregates(
-        #        self.cube, aggregates, drilldown, split, available_aggregate_functions()
-        #    )
-        #    result.cells = ResultIterator(cursor, builder.labels)
-        #    result.labels = builder.labels
+        # If exclude_null_aggregates is True then don't include cells where
+        # at least one of the bult-in aggregates is NULL
+        if result.cells is not None and self.exclude_null_agregates:
+            afuncs = available_aggregate_functions()
+            aggregates = [agg for agg in aggregates if not agg.function or agg.function in afuncs]
+            names = [str(agg) for agg in aggregates]
+            result.exclude_if_null = names
 
-        #    # TODO: Introduce option to disable this
-        #    if self.include_cell_count:
-        #        count_statement = builder.statement.alias().count()
-        #        row_count = self.execute_statement(count_statement).fetchone()
-        #        total_cell_count = row_count[0]
-        #        result.total_cell_count = total_cell_count
-
-        #elif result.summary is not None:
-        #    # Do calculated measures on summary if no drilldown or split
-        #    # TODO: should not we do this anyway regardless of
-        #    # drilldown/split?
-        #    calculators = calculators_for_aggregates(
-        #        self.cube, aggregates, drilldown, split, available_aggregate_functions()
-        #    )
-        #    for calc in calculators:
-        #        calc(result.summary)
-
-        ## If exclude_null_aggregates is True then don't include cells where
-        ## at least one of the bult-in aggregates is NULL
-        #if result.cells is not None and self.exclude_null_agregates:
-        #    afuncs = available_aggregate_functions()
-        #    aggregates = [agg for agg in aggregates if not agg.function or agg.function in afuncs]
-        #    names = [str(agg) for agg in aggregates]
-        #    result.exclude_if_null = names
-
-        #return result
+        return result
 
     def facts(self, cell=None, fields=None, order=None, page=None, page_size=None):
         """
@@ -235,33 +268,14 @@ class DjangoBrowser(AggregationBrowser):
         attributes = self.cube.get_attributes(fields)
         order = self.prepare_order(order, is_aggregate=False)
 
-        import ipdb; ipdb.set_trace()
-        #
-        # ... fetch the facts here ...
-        #
-        # facts = ... an iterable ...
-        #
-
-        facts = []
+        #builder.paginate(page, page_size)
+        facts = self.result_iterator(
+            self.build_query(
+                cell, attributes, page=page, page_size=page_size, order=order
+            )
+        )
         result = Facts(facts, attributes)
         return result
-
-        ## Do backend sql
-        #cell = cell or Cell(self.cube)
-        #attributes = self.cube.get_attributes(fields)
-
-        ### TODO: Refazer isso para o orm do django
-        #raise NotImplementedError
-        #builder = QueryBuilder(self)
-        #builder.denormalized_statement(
-        #    cell, attributes=attributes, include_fact_key=True
-        #)
-        #builder.paginate(page, page_size)
-        #order = self.prepare_order(order, is_aggregate=False)
-        #builder.order(order)
-
-        #cursor = self.execute_statement(builder.statement, "facts")
-        #return ResultIterator(cursor, builder.labels)
 
     def fact(self, key_value, fields=None):
         """
