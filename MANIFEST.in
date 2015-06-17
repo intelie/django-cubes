@@ -1,11 +1,9 @@
-recursive-include doc_src *
-recursive-include docs *
-
-recursive-include django_facts/api *
+recursive-include django_facts *
 recursive-include django_facts/backends *
 recursive-include django_facts/templates/cubes *
-recursive-include django_facts/examples *
 
 include LICENSE
 include README
 include *.txt
+
+prune example/

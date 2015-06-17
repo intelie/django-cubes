@@ -1,0 +1,808 @@
+[
+{
+  "pk": 1, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Unrestricted currencies", 
+    "subcategory": "dfb", 
+    "subcategory_label": "Due from Banks", 
+    "category_label": "Assets", 
+    "amount": 1581, 
+    "year": 2010
+  }
+},
+{
+  "pk": 2, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Unrestricted currencies", 
+    "subcategory": "dfb", 
+    "subcategory_label": "Due from Banks", 
+    "category_label": "Assets", 
+    "amount": 2380, 
+    "year": 2009
+  }
+},
+{
+  "pk": 3, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Currencies subject to restriction", 
+    "subcategory": "dfb", 
+    "subcategory_label": "Due from Banks", 
+    "category_label": "Assets", 
+    "amount": 222, 
+    "year": 2010
+  }
+},
+{
+  "pk": 4, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Currencies subject to restriction", 
+    "subcategory": "dfb", 
+    "subcategory_label": "Due from Banks", 
+    "category_label": "Assets", 
+    "amount": 664, 
+    "year": 2009
+  }
+},
+{
+  "pk": 5, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Trading", 
+    "subcategory": "i", 
+    "subcategory_label": "Investments", 
+    "category_label": "Assets", 
+    "amount": 36012, 
+    "year": 2010
+  }
+},
+{
+  "pk": 6, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Trading", 
+    "subcategory": "i", 
+    "subcategory_label": "Investments", 
+    "category_label": "Assets", 
+    "amount": 41012, 
+    "year": 2009
+  }
+},
+{
+  "pk": 7, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Securities purchased under resale agreements", 
+    "subcategory": "s", 
+    "subcategory_label": "Securities", 
+    "category_label": "Assets", 
+    "amount": 289, 
+    "year": 2010
+  }
+},
+{
+  "pk": 8, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Securities purchased under resale agreements", 
+    "subcategory": "s", 
+    "subcategory_label": "Securities", 
+    "category_label": "Assets", 
+    "amount": 33, 
+    "year": 2009
+  }
+},
+{
+  "pk": 9, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Nonnegotiable, nonintrest-bearing demand obligations on account of subscribed capital", 
+    "subcategory": "nn", 
+    "subcategory_label": "Nonnegotiable", 
+    "category_label": "Assets", 
+    "amount": 1123, 
+    "year": 2010
+  }
+},
+{
+  "pk": 10, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Nonnegotiable, nonintrest-bearing demand obligations on account of subscribed capital", 
+    "subcategory": "nn", 
+    "subcategory_label": "Nonnegotiable", 
+    "category_label": "Assets", 
+    "amount": 1202, 
+    "year": 2009
+  }
+},
+{
+  "pk": 11, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Investments", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 13249, 
+    "year": 2010
+  }
+},
+{
+  "pk": 12, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Investments", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 18467, 
+    "year": 2009
+  }
+},
+{
+  "pk": 13, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Client operations", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 17633, 
+    "year": 2010
+  }
+},
+{
+  "pk": 14, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Client operations", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 19559, 
+    "year": 2009
+  }
+},
+{
+  "pk": 15, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Borrowings", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 87457, 
+    "year": 2010
+  }
+},
+{
+  "pk": 16, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Borrowings", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 82793, 
+    "year": 2009
+  }
+},
+{
+  "pk": 17, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Other", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 3287, 
+    "year": 2010
+  }
+},
+{
+  "pk": 18, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Other", 
+    "subcategory": "da", 
+    "subcategory_label": "Derivative Assets", 
+    "category_label": "Assets", 
+    "amount": 2246, 
+    "year": 2009
+  }
+},
+{
+  "pk": 19, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Receivables to maintain value of currency holdings on account of subscribed capital", 
+    "subcategory": "rcv", 
+    "subcategory_label": "Receivables", 
+    "category_label": "Assets", 
+    "amount": 171, 
+    "year": 2010
+  }
+},
+{
+  "pk": 20, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Receivables to maintain value of currency holdings on account of subscribed capital", 
+    "subcategory": "rcv", 
+    "subcategory_label": "Receivables", 
+    "category_label": "Assets", 
+    "amount": 176, 
+    "year": 2009
+  }
+},
+{
+  "pk": 21, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Receivables from investment securities traded", 
+    "subcategory": "orcv", 
+    "subcategory_label": "Other Receivables", 
+    "category_label": "Assets", 
+    "amount": 47, 
+    "year": 2010
+  }
+},
+{
+  "pk": 22, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Receivables from investment securities traded", 
+    "subcategory": "orcv", 
+    "subcategory_label": "Other Receivables", 
+    "category_label": "Assets", 
+    "amount": 95, 
+    "year": 2009
+  }
+},
+{
+  "pk": 23, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Accrued income on loans", 
+    "subcategory": "orcv", 
+    "subcategory_label": "Other Receivables", 
+    "category_label": "Assets", 
+    "amount": 764, 
+    "year": 2010
+  }
+},
+{
+  "pk": 24, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Accrued income on loans", 
+    "subcategory": "orcv", 
+    "subcategory_label": "Other Receivables", 
+    "category_label": "Assets", 
+    "amount": 889, 
+    "year": 2009
+  }
+},
+{
+  "pk": 25, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Net loans outstanding", 
+    "subcategory": "lo", 
+    "subcategory_label": "Loans Outstanding", 
+    "category_label": "Assets", 
+    "amount": 118104, 
+    "year": 2010
+  }
+},
+{
+  "pk": 26, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Net loans outstanding", 
+    "subcategory": "lo", 
+    "subcategory_label": "Loans Outstanding", 
+    "category_label": "Assets", 
+    "amount": 103657, 
+    "year": 2009
+  }
+},
+{
+  "pk": 27, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Assets under retirement benefit plans", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 0, 
+    "year": 2010
+  }
+},
+{
+  "pk": 28, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Assets under retirement benefit plans", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 325, 
+    "year": 2009
+  }
+},
+{
+  "pk": 29, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Premises and equipment (net)", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 635, 
+    "year": 2010
+  }
+},
+{
+  "pk": 30, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Premises and equipment (net)", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 625, 
+    "year": 2009
+  }
+},
+{
+  "pk": 31, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Miscellaneous", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 2436, 
+    "year": 2010
+  }
+},
+{
+  "pk": 32, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "a", 
+    "line_item": "Miscellaneous", 
+    "subcategory": "oa", 
+    "subcategory_label": "Other Assets", 
+    "category_label": "Assets", 
+    "amount": 1297, 
+    "year": 2009
+  }
+},
+{
+  "pk": 33, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "All", 
+    "subcategory": "b", 
+    "subcategory_label": "Borrowings", 
+    "category_label": "Liabilities", 
+    "amount": 128577, 
+    "year": 2010
+  }
+},
+{
+  "pk": 34, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "All", 
+    "subcategory": "b", 
+    "subcategory_label": "Borrowings", 
+    "category_label": "Liabilities", 
+    "amount": 110040, 
+    "year": 2009
+  }
+},
+{
+  "pk": 35, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Securities Sold under Repurchase Agreements, Securities Lent under Securities Lending Agreements, and Payable for Cash Collateral Received", 
+    "subcategory": "sol", 
+    "subcategory_label": "Sold or Lent", 
+    "category_label": "Liabilities", 
+    "amount": 998, 
+    "year": 2010
+  }
+},
+{
+  "pk": 36, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Securities Sold under Repurchase Agreements, Securities Lent under Securities Lending Agreements, and Payable for Cash Collateral Received", 
+    "subcategory": "sol", 
+    "subcategory_label": "Sold or Lent", 
+    "category_label": "Liabilities", 
+    "amount": 2323, 
+    "year": 2009
+  }
+},
+{
+  "pk": 37, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Investments", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 13360, 
+    "year": 2010
+  }
+},
+{
+  "pk": 38, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Investments", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 18923, 
+    "year": 2009
+  }
+},
+{
+  "pk": 39, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Client Operations", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 17623, 
+    "year": 2010
+  }
+},
+{
+  "pk": 40, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Client Operations", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 19551, 
+    "year": 2009
+  }
+},
+{
+  "pk": 41, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Borrowings", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 78655, 
+    "year": 2010
+  }
+},
+{
+  "pk": 42, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Borrowings", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 76321, 
+    "year": 2009
+  }
+},
+{
+  "pk": 43, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Other", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 780, 
+    "year": 2010
+  }
+},
+{
+  "pk": 44, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Other", 
+    "subcategory": "dl", 
+    "subcategory_label": "Derivative Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 847, 
+    "year": 2009
+  }
+},
+{
+  "pk": 45, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Payable to Maintain Value of Currency Holdings on Account of Subscribed Capital", 
+    "subcategory": "o", 
+    "subcategory_label": "Other", 
+    "category_label": "Liabilities", 
+    "amount": 8, 
+    "year": 2010
+  }
+},
+{
+  "pk": 46, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Payable to Maintain Value of Currency Holdings on Account of Subscribed Capital", 
+    "subcategory": "o", 
+    "subcategory_label": "Other", 
+    "category_label": "Liabilities", 
+    "amount": 57, 
+    "year": 2009
+  }
+},
+{
+  "pk": 47, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Payable for investment securities purchased", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 307, 
+    "year": 2010
+  }
+},
+{
+  "pk": 48, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Payable for investment securities purchased", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 2457, 
+    "year": 2009
+  }
+},
+{
+  "pk": 49, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Accrued charges on borrowings", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 1190, 
+    "year": 2010
+  }
+},
+{
+  "pk": 50, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Accrued charges on borrowings", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 1495, 
+    "year": 2009
+  }
+},
+{
+  "pk": 51, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Liabilities under retirement benefit plans", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 1164, 
+    "year": 2010
+  }
+},
+{
+  "pk": 52, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Liabilities under retirement benefit plans", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 662, 
+    "year": 2009
+  }
+},
+{
+  "pk": 53, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Accounts payable and misc liabilities", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 2793, 
+    "year": 2010
+  }
+},
+{
+  "pk": 54, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "l", 
+    "line_item": "Accounts payable and misc liabilities", 
+    "subcategory": "ol", 
+    "subcategory_label": "Other Liabilities", 
+    "category_label": "Liabilities", 
+    "amount": 2707, 
+    "year": 2009
+  }
+},
+{
+  "pk": 55, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Paid-in capital", 
+    "subcategory": "cs", 
+    "subcategory_label": "Capital Stock", 
+    "category_label": "Equity", 
+    "amount": 11492, 
+    "year": 2010
+  }
+},
+{
+  "pk": 56, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Paid-in capital", 
+    "subcategory": "cs", 
+    "subcategory_label": "Capital Stock", 
+    "category_label": "Equity", 
+    "amount": 11491, 
+    "year": 2009
+  }
+},
+{
+  "pk": 57, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Deferred Amounts to Maintain Value of Currency Holdings", 
+    "subcategory": "da", 
+    "subcategory_label": "Deferred Amounts", 
+    "category_label": "Equity", 
+    "amount": 313, 
+    "year": 2010
+  }
+},
+{
+  "pk": 58, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Deferred Amounts to Maintain Value of Currency Holdings", 
+    "subcategory": "da", 
+    "subcategory_label": "Deferred Amounts", 
+    "category_label": "Equity", 
+    "amount": 359, 
+    "year": 2009
+  }
+},
+{
+  "pk": 59, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Retained Earnings", 
+    "subcategory": "re", 
+    "subcategory_label": "Retained Earnings", 
+    "category_label": "Equity", 
+    "amount": 28793, 
+    "year": 2010
+  }
+},
+{
+  "pk": 60, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Retained Earnings", 
+    "subcategory": "re", 
+    "subcategory_label": "Retained Earnings", 
+    "category_label": "Equity", 
+    "amount": 29870, 
+    "year": 2009
+  }
+},
+{
+  "pk": 61, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Accumulated Other Comorehensive Loss", 
+    "subcategory": "oe", 
+    "subcategory_label": "Other", 
+    "category_label": "Equity", 
+    "amount": -3043, 
+    "year": 2010
+  }
+},
+{
+  "pk": 62, 
+  "model": "hello_world.irbdbalance", 
+  "fields": {
+    "category": "e", 
+    "line_item": "Accumulated Other Comorehensive Loss", 
+    "subcategory": "oe", 
+    "subcategory_label": "Other", 
+    "category_label": "Equity", 
+    "amount": -1683, 
+    "year": 2009
+  }
+}
+]

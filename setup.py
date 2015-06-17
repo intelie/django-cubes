@@ -62,7 +62,7 @@ setup(
     author_email='vitor.mazzi@intelie.com.br',
     description='',
     long_description=get_readme(),
-    packages=find_packages(),
+    packages=find_packages(exclude=["example"]),
     include_package_data=True,
     install_requires=install_requires(),
     extras_require=extras,
