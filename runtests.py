@@ -2,14 +2,6 @@
 
 from os.path import dirname, join, abspath
 import sys
-from optparse import OptionParser
-
-
-def parse_args():
-    parser = OptionParser()
-    parser.add_option('--postgresql', action='store_true', dest='USE_POSTGRESQL', default=False)
-    parser.add_option('--sqlite', action='store_false', dest='USE_POSTGRESQL')
-    return parser.parse_args()
 
 
 def configure_settings(options):
@@ -51,23 +43,6 @@ def configure_settings(options):
             SLICER_CONFIG_FILE=join(abspath(dirname(__file__)), 'django_cubes', 'tests', 'assets', 'slicer-sql_backend.ini'),
         )
 
-        if getattr(options, 'USE_POSTGRESQL', False):
-            DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                    'NAME': 'django_cubes_test',
-                    'USER': 'postgres',
-                }
-            }
-        else:
-            DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': ':memory:',
-                }
-            }
-
-        params.update(DATABASES=DATABASES)
         # Configure Django's settings
         settings.configure(**params)
 
@@ -104,5 +79,4 @@ if __name__ == '__main__':
         filemode='a',
     )
 
-    options, labels = parse_args()
-    runtests(options, labels)
+    runtests()
