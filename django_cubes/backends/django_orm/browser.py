@@ -75,9 +75,6 @@ class DjangoBrowser(AggregationBrowser):
         if self.cube.browser_options.get('class_name'):
             self.class_name = self.cube.browser_options.get('class_name')
 
-        # XXX: Obter referência à classe do model onde?
-        # self.class_name = get_model(self.class_name.split('.'))
-
         # São usados no `provide_aggregate`
         self.include_summary = options.get("include_summary", True)
         self.include_cell_count = options.get("include_cell_count", True)
@@ -98,9 +95,9 @@ class DjangoBrowser(AggregationBrowser):
         """
 
         return {
-            "actions": ["aggregate", "fact", "members", "facts", "cell"],
-            "aggregate_functions": available_aggregate_functions(),
-            "post_aggregate_functions": available_calculators()
+            "actions": ["aggregate", "facts", "cell"],
+            "aggregate_functions": sorted(available_aggregate_functions()),
+            "post_aggregate_functions": sorted(available_calculators())
         }
 
     def is_builtin_function(self, function_name, aggregate):
@@ -127,7 +124,7 @@ class DjangoBrowser(AggregationBrowser):
     def build_query(self, cell, attributes, page=None, page_size=None, order=None, include_fact_key=False):
         qset = self._build_cell_cut_qset(cell)
         if order:
-            order_fields =  [item[0].name for item in order]
+            order_fields = [item[0].name for item in order]
             qset = qset.order_by(*order_fields)
         if page and page_size:
             start = (page - 1) * page_size
@@ -136,7 +133,6 @@ class DjangoBrowser(AggregationBrowser):
         return qset.values()
 
     def build_aggregation(self, cell, aggregates, drilldown, summary_only=False):
-        filter_kwargs = {}
         args, kwargs = [], {}
         qset = self._build_cell_cut_qset(cell)
 
@@ -151,16 +147,6 @@ class DjangoBrowser(AggregationBrowser):
             args = [item.name for item in drilldown.all_attributes()]
             result = qset.values(*args).annotate(**kwargs).order_by(*args)
 
-        return result
-
-    def result_iterator(self, cells):
-        result = []
-        for cell in cells:
-            new_cell = dict(
-                (self.mapper.reverse_mappings.get(k, k), v)
-                for k, v in cell.items()
-            )
-            result.append(new_cell)
         return result
 
     def provide_aggregate(self, cell, aggregates, drilldown, split, order, page, page_size, **options):
@@ -268,104 +254,19 @@ class DjangoBrowser(AggregationBrowser):
         attributes = self.cube.get_attributes(fields)
         order = self.prepare_order(order, is_aggregate=False)
 
-        #builder.paginate(page, page_size)
         facts = self.result_iterator(
             self.build_query(
                 cell, attributes, page=page, page_size=page_size, order=order
             )
         )
-        result = Facts(facts, attributes)
+        return Facts(facts, attributes)
+
+    def result_iterator(self, cells):
+        result = []
+        for cell in cells:
+            new_cell = dict(
+                (self.mapper.reverse_mappings.get(k, k), v)
+                for k, v in cell.items()
+            )
+            result.append(new_cell)
         return result
-
-    def fact(self, key_value, fields=None):
-        """
-        Get a single fact with key `key_value` from cube.
-        """
-        attributes = self.cube.get_attributes(fields)
-        import ipdb; ipdb.set_trace()
-
-        ## Do backend sql
-        ## TODO: Refazer isso para o orm do django
-        #raise NotImplementedError
-        #builder = QueryBuilder(self)
-        #builder.denormalized_statement(attributes=attributes, include_fact_key=True)
-        #builder.fact(key_value)
-
-        #cursor = self.execute_statement(builder.statement, "facts")
-        #row = cursor.fetchone()
-        #if row:
-        #    # Convert SQLAlchemy object into a dictionary
-        #    record = dict(zip(builder.labels, row))
-        #else:
-        #    record = None
-        #cursor.close()
-
-        #return record
-
-    def provide_members(self, cell, dimension, **kwargs):
-        """
-        Return values for `dimension` with level depth `depth`. If `depth`
-        is ``None``, all levels are returned.
-
-        Number of database queries: 1.
-        """
-        depth = kwargs.get('depth', None)
-        hierarchy = kwargs.get('hierarchy', None)
-        levels = kwargs.get('levels', None)
-        attributes = kwargs.get('attributes', None)
-        page = kwargs.get('page', None)
-        page_size = kwargs.get('page_size', None)
-        order = kwargs.get('order', None)
-
-        if not attributes:
-            attributes = []
-            for level in levels:
-                attributes += level.attributes
-
-        # Do backend sql
-        ## TODO: Refazer isso para o orm do django
-        #raise NotImplementedError
-        #builder = QueryBuilder(self)
-        #builder.members_statement(cell, attributes)
-        #builder.paginate(page, page_size)
-        #builder.order(order)
-
-        #result = self.execute_statement(builder.statement, "members")
-
-        #return ResultIterator(result, builder.labels)
-
-    def path_details(self, dimension, path, hierarchy=None):
-        """
-        Returns details for `path` in `dimension`. Can be used for
-        multi-dimensional "breadcrumbs" in a used interface.
-
-        Number of SQL queries: 1.
-        """
-        dimension = self.cube.dimension(dimension)
-        hierarchy = dimension.hierarchy(hierarchy)
-
-        cut = PointCut(dimension, path, hierarchy=hierarchy)
-        cell = Cell(self.cube, [cut])
-
-        attributes = []
-        for level in hierarchy.levels[0:len(path)]:
-            attributes += level.attributes
-
-        # TODO: Refazer isso para o orm do django
-        raise NotImplementedError
-        builder = QueryBuilder(self)
-        builder.denormalized_statement(
-            cell, attributes=attributes, include_fact_key=True
-        )
-        builder.paginate(0, 1)
-        cursor = self.execute_statement(
-            builder.statement, "path details"
-        )
-
-        row = cursor.fetchone()
-        if row:
-            member = dict(zip(builder.labels, row))
-        else:
-            member = None
-
-        return member

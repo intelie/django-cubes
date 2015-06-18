@@ -22,34 +22,34 @@
   <h1>Cubes OLAP server{% if label %} – {{label}}{% endif %}</h1>
 
   {% if has_about %}
-  <h2>About</h2>
+    <h2>About</h2>
 
-  {% if description %}<p>{{description}}</p>{% endif %}
+    {% if description %}<p>{{description}}</p>{% endif %}
+    <table id="info">
+        {% if name %}<tr><th>Name</th><td>{{name}}</td></tr>{% endif %}
+        {% if copyright %}<tr><th>Copyright</th><td>{{copyright}}</td></tr>{% endif %}
+        {% if license %}<tr><th>License</th><td>{{license}}</td></tr>{% endif %}
+        {% if maintainer %}<tr><th>Maintainer</th><td>{{maintainer}}</td></tr>{% endif %}
+        {% if keywords %}<tr><th>Keywords</th><td>{{keywords|join:", "}}</td></tr>{% endif %}
+    </table>
 
-  <table id="info">
-      {% if name %}<tr><th>Name</th><td>{{name}}</td></tr>{% endif %}
-      {% if copyright %}<tr><th>Copyright</th><td>{{copyright}}</td></tr>{% endif %}
-      {% if license %}<tr><th>License</th><td>{{license}}</td></tr>{% endif %}
-      {% if maintainer %}<tr><th>Maintainer</th><td>{{maintainer}}</td></tr>{% endif %}
-      {% if keywords %}<tr><th>Keywords</th><td>{{keywords|join(", ")}}</td></tr>{% endif %}
-  </table>
-  {% if visualizers %}
-  <h2>Visualizers</h2>
-  <ul>
-  {% for visualizer in visualizers %}
-      <li><a href="{{visualizer.url}}">{{visualizer.label}}</a></li>
-  {% endfor %}
-  </ul>
-  {% endif %}
+    {% if visualizers %}
+      <h2>Visualizers</h2>
+      <ul>
+      {% for visualizer in visualizers %}
+          <li><a href="{{visualizer.url}}">{{visualizer.label}}</a></li>
+      {% endfor %}
+      </ul>
+    {% endif %}
 
-  {% if related %}
-  <h2>Related Slicers</h2>
-  <ul>
-  {% for slicer in related %}
-      <li><a href="{{slicer.url}}">{{slicer.label}}</a></li>
-  {% endfor %}
-  </ul>
-  {% endif %}
+    {% if related %}
+      <h2>Related Slicers</h2>
+      <ul>
+      {% for slicer in related %}
+          <li><a href="{{slicer.url}}">{{slicer.label}}</a></li>
+      {% endfor %}
+      </ul>
+    {% endif %}
 
   {% endif %}
 
@@ -63,8 +63,8 @@
   </table>
 
   {% if contributors %}
-  <h2>Contributors</h2>
-  <p>{{ contributors|join(', ') }}</p>
+    <h2>Contributors</h2>
+    <p>{{ contributors|join:', ' }}</p>
   {% endif %}
 
 

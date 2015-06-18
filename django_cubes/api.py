@@ -3,11 +3,13 @@ import logging
 from collections import OrderedDict
 
 from rest_framework.views import APIView
-from rest_framework import permissions, status
-from rest_framework.response import Response, ErrorResponse
+from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.exceptions import ParseError
 from rest_framework.renderers import TemplateHTMLRenderer
 
-from cubes import __version__, Workspace, SLICER_INFO_KEYS, cut_from_dict
+from cubes import __version__, cut_from_dict
+from cubes.workspace import Workspace, SLICER_INFO_KEYS
 from cubes.errors import NoSuchCubeError
 from cubes.calendar import CalendarMemberConverter
 from cubes.browser import Cell, cuts_from_string
@@ -42,8 +44,10 @@ class CubesView(APIView):
 
     def initialize_slicer(self):
         if self.workspace is None:
-            slicer_config_file = getattr(settings, 'SLICER_CONFIG_FILE', 'slicer.ini')
-            self.workspace = Workspace(config=slicer_config_file)
+            self.workspace = Workspace(
+                config=settings.SLICER_CONFIG_FILE,
+                cubes_root=settings.SLICER_MODELS_DIR
+            )
 
     def get_cube(self, request, cube_name):
         self.initialize_slicer()
@@ -94,6 +98,14 @@ class CubesView(APIView):
         info["api_version"] = API_VERSION
         return info
 
+    def assert_enabled_action(self, request, browser, action):
+        features = browser.features()
+        if action not in features['actions']:
+            message = u"The action '{}' is not enabled".format(action)
+            logging.error(message)
+            raise ParseError(detail=message)
+
+
     def _handle_pagination_and_order(self, request):
         try:
             page = request.query_params.get('page', None)
@@ -137,7 +149,7 @@ class Index(CubesView):
 class Info(CubesView):
 
     def get(self, request):
-        return Response(self.get_info)
+        return Response(self.get_info())
 
 
 class ListCubes(CubesView):
@@ -176,6 +188,8 @@ class CubeAggregation(CubesView):
     def get(self, request, cube_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
+        self.assert_enabled_action(request, browser, 'aggregate')
+
         cell = self.get_cell(request, cube, restrict=True)
 
         # Aggregates
@@ -200,7 +214,7 @@ class CubeAggregation(CubesView):
             order=request.order
         )
 
-        return Response(result)
+        return Response(result.to_dict())
 
 
 class CubeCell(CubesView):
@@ -208,6 +222,8 @@ class CubeCell(CubesView):
     def get(self, request, cube_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
+        self.assert_enabled_action(request, browser, 'cell')
+
         cell = self.get_cell(request, cube, restrict=True)
         details = browser.cell_details(cell)
 
@@ -226,16 +242,17 @@ class CubeReport(CubesView):
     def make_report(self, request, cube_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
-        cell = self.get_cell(request, cube, restrict=True)
+        self.assert_enabled_action(request, browser, 'report')
 
         report_request = request.DATA
         try:
             queries = report_request["queries"]
         except KeyError:
             message = "Report request does not contain 'queries' key"
-            logging.error(message, request=request)
-            raise ErrorResponse(status.HTTP_400_BAD_REQUEST, content=message)
+            logging.error(message)
+            raise ParseError(detail=message)
 
+        cell = self.get_cell(request, cube, restrict=True)
         cell_cuts = report_request.get("cell")
 
         if cell_cuts:
@@ -271,7 +288,7 @@ class CubeFacts(CubesView):
     def get(self, request, cube_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
-        cell = self.get_cell(request, cube, restrict=True)
+        self.assert_enabled_action(request, browser, 'facts')
 
         # Construct the field list
         fields_str = request.query_params.get('fields')
@@ -281,6 +298,7 @@ class CubeFacts(CubesView):
             attributes = cube.all_attributes
 
         fields = [attr.ref() for attr in attributes]
+        cell = self.get_cell(request, cube, restrict=True)
 
         # Get the result
         facts = browser.facts(
@@ -299,6 +317,7 @@ class CubeFact(CubesView):
     def get(self, request, cube_name, fact_id):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
+        self.assert_enabled_action(request, browser, 'fact')
         fact = browser.fact(fact_id)
         return Response(fact)
 
@@ -308,14 +327,14 @@ class CubeMembers(CubesView):
     def get(self, request, cube_name, dimension_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
-        cell = self.get_cell(request, cube, restrict=True)
+        self.assert_enabled_action(request, browser, 'members')
 
         try:
             dimension = cube.dimension(dimension_name)
         except KeyError:
             message = "Dimension '%s' was not found" % dimension_name
-            logging.error(message, request=request)
-            raise ErrorResponse(status.HTTP_400_BAD_REQUEST, content=message)
+            logging.error(message)
+            raise ParseError(detail=message)
 
         hier_name = request.query_params.get('hierarchy')
         hierarchy = dimension.hierarchy(hier_name)
@@ -325,20 +344,21 @@ class CubeMembers(CubesView):
 
         if depth and level:
             message = "Both depth and level provided, use only one (preferably level)"
-            logging.error(message, request=request)
-            raise ErrorResponse(status.HTTP_400_BAD_REQUEST, content=message)
+            logging.error(message)
+            raise ParseError(detail=message)
         elif depth:
             try:
                 depth = int(depth)
             except ValueError:
                 message = "depth should be an integer"
-                logging.error(message, request=request)
-                raise ErrorResponse(status.HTTP_400_BAD_REQUEST, content=message)
+                logging.error(message)
+                raise ParseError(detail=message)
         elif level:
             depth = hierarchy.level_index(level) + 1
         else:
             depth = len(hierarchy)
 
+        cell = self.get_cell(request, cube, restrict=True)
         values = browser.members(
             cell,
             dimension,
