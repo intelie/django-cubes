@@ -3,7 +3,7 @@ recursive-include django_cubes/backends *
 recursive-include django_cubes/templates/cubes *
 
 include LICENSE
-include README
+include README.rst
 include *.txt
 
 prune example/

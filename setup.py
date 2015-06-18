@@ -50,7 +50,7 @@ def install_requires():
 
 setup(
     name="django-cubes",
-    version="0.0.1",
+    version="0.0.2",
     url='https://github.com/intelie/django-cubes',
     author='Vitor M. A. da Cruz',
     author_email='vitor.mazzi@intelie.com.br',
