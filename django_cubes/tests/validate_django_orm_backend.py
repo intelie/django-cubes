@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import six
+from os import path
 from cubes import Workspace, Cell, PointCut
 
 from django.test import TransactionTestCase
@@ -19,8 +20,8 @@ class ValidateDjangoOrmBrowser(TransactionTestCase):
     def setUp(self):
         super(ValidateDjangoOrmBrowser, self).setUp()
         self.workspace = Workspace(
-            config=settings.SLICER_CONFIG_FILE,
-            cubes_root=settings.SLICER_MODELS_DIR
+            cubes_root=settings.SLICER_MODELS_DIR,
+            config=path.join(settings.SLICER_MODELS_DIR, 'slicer-django_backend.ini'),
         )
         self.browser = self.workspace.browser("irbd_balance")
 

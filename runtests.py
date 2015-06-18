@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from os.path import dirname, join
+from os.path import dirname, join, abspath
 import sys
 from optparse import OptionParser
 
@@ -30,11 +30,25 @@ def configure_settings(options):
                 'django.contrib.auth',
                 'django.contrib.sessions',
                 'django_cubes',
+                'example.hello_world',
             ),
-            MIDDLEWARE_CLASSES=(),
+            MIDDLEWARE_CLASSES=(
+                'django.middleware.common.CommonMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+            ),
             SITE_ID=1,
             TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
             TEST_ROOT=join(dirname(__file__), 'django_cubes', 'tests'),
+            TEMPLATE_LOADERS=(
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ),
+            ROOT_URLCONF='django_cubes.urls',
+            SLICER_MODELS_DIR=join(abspath(dirname(__file__)), 'django_cubes', 'tests', 'assets'),
+            SLICER_CONFIG_FILE=join(abspath(dirname(__file__)), 'django_cubes', 'tests', 'assets', 'slicer-sql_backend.ini'),
         )
 
         if getattr(options, 'USE_POSTGRESQL', False):

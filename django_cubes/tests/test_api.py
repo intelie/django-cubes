@@ -40,7 +40,7 @@ class BaseCubesAPITest(TransactionTestCase):
         return getattr(self.client, self.method)(url)
 
     def login(self):
-        self.client.login(username=self.username, password=self.password)
+        return self.client.login(username=self.username, password=self.password)
 
     def test_requires_authentication(self):
         response = self.make_request()
@@ -52,7 +52,7 @@ class CubesApiIndex(BaseCubesAPITest):
     method = 'get'
 
     def test_api_request(self):
-        self.login()
+        self.assertTrue(self.login())
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'cubes/index.html')
@@ -87,7 +87,7 @@ class CubesInfoAPI(BaseCubesAPITest):
             'api_version': 2,
             'cubes_version': u'1.0.1',
             'first_weekday': 0,
-            'timezone': u'CDT'
+            'timezone': u'BRT'
         })
 
 
@@ -111,7 +111,7 @@ class CubeModelAPI(BaseCubesAPITest):
     url_args = {'cube_name': 'irbd_balance'}
     method = 'get'
 
-    def test_api_request(self):
+    def _test_api_request(self):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
@@ -192,7 +192,7 @@ class CubeModelAPI(BaseCubesAPITest):
                 }
             ],
             'features': {
-                'actions': ['aggregate', 'facts', 'cell'],
+                'actions': ['aggregate', 'fact', 'members', 'facts', 'cell'],
                 'aggregate_functions': ['avg', 'count', 'max', 'min', 'sum'],
                 'post_aggregate_functions': ['sma', 'smrsd', 'sms', 'smstd', 'smvar', 'wma']
             },
@@ -207,7 +207,6 @@ class CubeAggregationAPI(BaseCubesAPITest):
     url_name = 'cube_aggregation'
     url_args = {'cube_name': 'irbd_balance'}
     method = 'get'
-    fixtures = ['irbdbalance.json']
 
     def test_aggregation_summary(self):
         self.login()
@@ -444,7 +443,6 @@ class CubeCellAPI(BaseCubesAPITest):
     url_name = 'cube_cell'
     url_args = {'cube_name': 'irbd_balance'}
     method = 'get'
-    fixtures = ['irbdbalance.json']
 
     def test_cell(self):
         self.login()
@@ -463,10 +461,10 @@ class CubeCellAPI(BaseCubesAPITest):
         self.assertEquals(response.status_code, 200)
         content = json.loads(response.content)
         self.assertEquals(content, {
-            'cube': 'irbd_balance',
+            'cube': u'irbd_balance',
             'cuts': [{
                 'details': [
-                    {'_key': 'a', '_label': 'a', 'item.category': 'a', 'item.category_label': 'a'}
+                    {'_key': 'a', '_label': 'Assets', 'item.category': 'a', 'item.category_label': 'Assets'}
                 ],
                 'dimension': 'item',
                 'hidden': False,
@@ -483,7 +481,6 @@ class CubeFactsAPI(BaseCubesAPITest):
     url_name = 'cube_facts'
     url_args = {'cube_name': 'irbd_balance'}
     method = 'get'
-    fixtures = ['irbdbalance.json']
 
     def test_facts(self):
         self.login()
@@ -588,24 +585,28 @@ class CubeFactAPI(BaseCubesAPITest):
     url_name = 'cube_fact'
     url_args = {'cube_name': 'irbd_balance', 'fact_id': 1}
     method = 'get'
-    fixtures = ['irbdbalance.json']
 
-    def test_fact_is_disabled_on_the_browser(self):
+    def test_api_request(self):
         self.login()
         response = self.make_request()
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 200)
         content = json.loads(response.content)
-        self.assertEquals(
-            content,
-            {'detail': "The action 'fact' is not enabled"}
-        )
+        self.assertEquals(content, {
+            'amount': 1581,
+            'id': 1,
+            'item.category': 'a',
+            'item.category_label': 'Assets',
+            'item.line_item': 'Unrestricted currencies',
+            'item.subcategory': 'dfb',
+            'item.subcategory_label': 'Due from Banks',
+            'year': 2010
+        })
 
 
 class CubeMembersAPI(BaseCubesAPITest):
     url_name = 'cube_members'
     url_args = {'cube_name': 'irbd_balance', 'dimension_name': 'item'}
     method = 'get'
-    fixtures = ['irbdbalance.json']
 
     def test_members_with_cut(self):
         self.login()
@@ -615,4 +616,8 @@ class CubeMembersAPI(BaseCubesAPITest):
         self.assertEquals(response.status_code, 200)
         content = json.loads(response.content)
         self.assertEquals(content, {
+            'data': [{u'item.category': u'e', u'item.category_label': u'Equity'}],
+            'depth': 1,
+            'dimension': u'item',
+            'hierarchy': u'default'
         })
