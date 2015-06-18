@@ -7,3 +7,4 @@ include README.rst
 include *.txt
 
 prune example/
+prune django_cubes/tests
