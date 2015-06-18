@@ -20,5 +20,4 @@ Development
     cd django-cubes
     mkvirtualenv django-cubes
     pip install virtualenv  # Otherwise tox will not be able to run
-    echo "create database django_cubes_test" | psql -U postgres
     python setup.py test

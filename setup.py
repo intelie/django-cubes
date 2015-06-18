@@ -72,5 +72,5 @@ setup(
     classifiers=[
         'Framework :: Django',
     ],
-    license="Apache 2.0",
+    license="MIT",
 )
