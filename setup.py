@@ -48,12 +48,6 @@ def install_requires():
     return read_file('requirements.txt')
 
 
-extras = {
-    'facts': 'django-facts>=0.5.3',
-    'all': ['django-cubes[%s]' % extra for extra in ['facts']],
-}
-
-
 setup(
     name="django-cubes",
     version="0.0.1",
@@ -65,7 +59,6 @@ setup(
     packages=find_packages(exclude=["example"]),
     include_package_data=True,
     install_requires=install_requires(),
-    extras_require=extras,
     tests_require=['virtualenv>=1.11.2', 'tox>=1.6.1', ],
     cmdclass={'test': Tox},
     test_suite='django_cubes.tests',
