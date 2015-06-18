@@ -20,9 +20,10 @@ from django.http import Http404
 API_VERSION = 2
 
 __all__ = [
-    'ApiVersion', 'Index', 'Info', 'ListCubes',
-    'CubeModel', 'CubeAggregation', 'CubeCell',
-    'CubeFacts', 'CubeFact', 'CubeMembers',
+    'Index', 'ApiVersion', 'Info',
+    'ListCubes', 'CubeModel', 'CubeAggregation',
+    'CubeCell', 'CubeReport', 'CubeFacts',
+    'CubeFact', 'CubeMembers',
 ]
 
 

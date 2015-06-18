@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
+from mock import Mock, patch
 from django.test import TransactionTestCase
 from django.contrib.auth import get_user_model
 
+from cubes.backends.sql.browser import SnowflakeBrowser, available_aggregate_functions, available_calculators
 from rest_framework.reverse import reverse
 
 User = get_user_model()
@@ -10,8 +12,8 @@ User = get_user_model()
 __all__ = [
     'CubesApiIndex', 'CubesVersionAPI', 'CubesInfoAPI',
     'CubeListAPI', 'CubeModelAPI', 'CubeAggregationAPI',
-    'CubeCellAPI', 'CubeFactsAPI', 'CubeFactAPI',
-    'CubeMembersAPI'
+    'CubeCellAPI', 'CubeReportAPI', 'CubeFactsAPI',
+    'CubeFactAPI', 'CubeMembersAPI'
 ]
 
 
@@ -34,10 +36,12 @@ class BaseCubesAPITest(TransactionTestCase):
         self.user.set_password(self.password)
         self.user.save()
 
-    def make_request(self, url=None, data=None):
+    def make_request(self, url=None, data=None, **kwargs):
         if url is None:
             url = reverse(self.url_name, kwargs=self.url_args)
-        return getattr(self.client, self.method)(url)
+        if data is None:
+            data = {}
+        return getattr(self.client, self.method)(url, data, **kwargs)
 
     def login(self):
         return self.client.login(username=self.username, password=self.password)
@@ -474,6 +478,46 @@ class CubeCellAPI(BaseCubesAPITest):
                 'path': ['a'],
                 'type': 'point'
             }]
+        })
+
+
+class CubeReportAPI(BaseCubesAPITest):
+    url_name = 'cube_report'
+    url_args = {'cube_name': 'irbd_balance'}
+    method = 'post'
+    report_spec = json.dumps({
+        'queries': {
+            'item_summary': {
+                'query': 'aggregate',
+                'drilldown': ['item'],
+                'level': 'category'
+            }
+        }
+    })
+    fake_features = {
+        "actions": ["aggregate", "fact", "members", "facts", "cell", "report"],
+        "aggregate_functions": available_aggregate_functions(),
+        "post_aggregate_functions": available_calculators()
+    }
+
+    def test_report_is_disabled_on_the_cubes_sql_backend(self):
+        self.login()
+        response = self.make_request(data=self.report_spec, content_type='application/json')
+        self.assertEquals(response.status_code, 400)
+        content = json.loads(response.content)
+        self.assertEquals(content, {"detail": "The action 'report' is not enabled"})
+
+    @patch.object(SnowflakeBrowser, 'features', Mock(return_value=fake_features))
+    def test_api_request(self):
+        self.login()
+        response = self.make_request(data=self.report_spec, content_type='application/json')
+        self.assertEquals(response.status_code, 200)
+        content = json.loads(response.content)
+        self.assertEquals(content, {
+            'item_summary': [
+                {u'amount_sum': 558430, u'item.category': u'a', u'item.category_label': u'Assets', u'record_count': 32},
+                {u'amount_sum': 77592, u'item.category': u'e', u'item.category_label': u'Equity', u'record_count': 8},
+                {u'amount_sum': 480838, u'item.category': u'l', u'item.category_label': u'Liabilities', u'record_count': 22}]
         })
 
 
