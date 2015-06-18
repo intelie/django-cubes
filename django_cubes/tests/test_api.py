@@ -1,4 +1,4 @@
-# -*- coding: utf-7 -*-
+# -*- coding: utf-8 -*-
 import json
 from django.test import TransactionTestCase
 from django.contrib.auth import get_user_model
@@ -192,7 +192,7 @@ class CubeModelAPI(BaseCubesAPITest):
                 }
             ],
             'features': {
-                'actions': ['aggregate', 'members', 'facts', 'cell'],
+                'actions': ['aggregate', 'facts', 'cell'],
                 'aggregate_functions': ['avg', 'count', 'max', 'min', 'sum'],
                 'post_aggregate_functions': ['sma', 'smrsd', 'sms', 'smstd', 'smvar', 'wma']
             },

@@ -3,7 +3,7 @@ from django.db.models import get_model
 from django.db.models import Count, Max, Min, Sum, Avg
 
 from cubes.logging import get_logger
-from cubes.browser import AggregationBrowser, AggregationResult, Cell, Facts, PointCut
+from cubes.browser import AggregationBrowser, AggregationResult, Cell, Facts
 from cubes.statutils import calculators_for_aggregates, available_calculators
 
 from .mapper import DjangoMapper
