@@ -56,7 +56,7 @@ setup(
     author_email='vitor.mazzi@intelie.com.br',
     description='',
     long_description=get_readme(),
-    packages=find_packages(exclude=["example"]),
+    packages=find_packages(exclude=["example", "*.tests", "*.tests.*", "tests.*", "tests"]),
     include_package_data=True,
     install_requires=install_requires(),
     tests_require=['virtualenv>=1.11.2', 'tox>=1.6.1', ],
