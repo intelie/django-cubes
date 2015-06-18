@@ -17,6 +17,12 @@ __all__ = [
 ]
 
 
+def load_json(source):
+    if isinstance(source, bytes):
+        return json.loads(source.decode('utf-8'))
+    return json.loads(source)
+
+
 class BaseCubesAPITest(TransactionTestCase):
     url_name = None
     url_args = {}
@@ -70,7 +76,7 @@ class CubesVersionAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             "version": "1.0.1",
             "server_version": "1.0.1",
@@ -86,7 +92,7 @@ class CubesInfoAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'api_version': 2,
             'cubes_version': u'1.0.1',
@@ -103,7 +109,7 @@ class CubeListAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, [{
             'info': {'min_date': '2010-01-01', 'max_date': '2010-12-31'},
             'label': 'irbd_balance', 'category': None, 'name': 'irbd_balance'
@@ -119,7 +125,7 @@ class CubeModelAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'aggregates': [
                 {
@@ -216,7 +222,7 @@ class CubeAggregationAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'summary': {'record_count': 62, 'amount_sum': 1116860},
             'cells': [],
@@ -231,7 +237,7 @@ class CubeAggregationAPI(BaseCubesAPITest):
         url = "%s?drilldown=item&cut=item:a" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'remainder': {},
             'summary': {'record_count': 32, 'amount_sum': 558430},
@@ -324,7 +330,7 @@ class CubeAggregationAPI(BaseCubesAPITest):
         url = "%s?drilldown=item&cut=item:a&aggregates=amount_sum|record_count" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'remainder': {},
             'summary': {'record_count': 32, 'amount_sum': 558430},
@@ -417,7 +423,7 @@ class CubeAggregationAPI(BaseCubesAPITest):
         url = "%s?drilldown=item&aggregates=amount_sum" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEqual(content, {
             'aggregates': ['amount_sum'],
             'cell': [],
@@ -452,7 +458,7 @@ class CubeCellAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'cube': 'irbd_balance', 'cuts': []
         })
@@ -463,7 +469,7 @@ class CubeCellAPI(BaseCubesAPITest):
         url = "%s?cut=item:a" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'cube': u'irbd_balance',
             'cuts': [{
@@ -504,7 +510,7 @@ class CubeReportAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request(data=self.report_spec, content_type='application/json')
         self.assertEquals(response.status_code, 400)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {"detail": "The action 'report' is not enabled"})
 
     @patch.object(SnowflakeBrowser, 'features', Mock(return_value=fake_features))
@@ -512,12 +518,12 @@ class CubeReportAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request(data=self.report_spec, content_type='application/json')
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'item_summary': [
-                {u'amount_sum': 558430, u'item.category': u'a', u'item.category_label': u'Assets', u'record_count': 32},
-                {u'amount_sum': 77592, u'item.category': u'e', u'item.category_label': u'Equity', u'record_count': 8},
-                {u'amount_sum': 480838, u'item.category': u'l', u'item.category_label': u'Liabilities', u'record_count': 22}]
+                {'amount_sum': 558430, 'item.category': 'a', 'item.category_label': 'Assets', 'record_count': 32},
+                {'amount_sum': 77592, 'item.category': 'e', 'item.category_label': 'Equity', 'record_count': 8},
+                {'amount_sum': 480838, 'item.category': 'l', 'item.category_label': 'Liabilities', 'record_count': 22}]
         })
 
 
@@ -530,7 +536,7 @@ class CubeFactsAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        facts = json.loads(response.content)
+        facts = load_json(response.content)
         self.assertEquals(len(facts), 62)
 
     def test_facts_with_cut(self):
@@ -539,7 +545,7 @@ class CubeFactsAPI(BaseCubesAPITest):
         url = "%s?page=1&cut=item:e" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        facts = json.loads(response.content)
+        facts = load_json(response.content)
         self.assertEquals(len(facts), 8)
         self.assertEquals(facts, [
             {
@@ -634,7 +640,7 @@ class CubeFactAPI(BaseCubesAPITest):
         self.login()
         response = self.make_request()
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
             'amount': 1581,
             'id': 1,
@@ -658,10 +664,10 @@ class CubeMembersAPI(BaseCubesAPITest):
         url = "%s?level=category&cut=item:e" % base_url
         response = self.make_request(url)
         self.assertEquals(response.status_code, 200)
-        content = json.loads(response.content)
+        content = load_json(response.content)
         self.assertEquals(content, {
-            'data': [{u'item.category': u'e', u'item.category_label': u'Equity'}],
+            'data': [{'item.category': 'e', 'item.category_label': 'Equity'}],
             'depth': 1,
-            'dimension': u'item',
-            'hierarchy': u'default'
+            'dimension': 'item',
+            'hierarchy': 'default'
         })
