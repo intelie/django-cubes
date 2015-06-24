@@ -16,6 +16,7 @@ from cubes.browser import Cell, cuts_from_string
 
 from django.conf import settings
 from django.http import Http404
+from django.core.exceptions import ImproperlyConfigured
 
 API_VERSION = 2
 
@@ -45,10 +46,13 @@ class CubesView(APIView):
 
     def initialize_slicer(self):
         if self.workspace is None:
-            self.workspace = Workspace(
-                config=settings.SLICER_CONFIG_FILE,
-                cubes_root=settings.SLICER_MODELS_DIR
-            )
+            try:
+                config = settings.SLICER_CONFIG_FILE
+                cubes_root = settings.SLICER_MODELS_DIR
+            except AttributeError:
+                raise ImproperlyConfigured('settings.SLICER_CONFIG_FILE and settings.SLICER_MODELS_DIR are not set.')
+
+            self.workspace = Workspace(config=config, cubes_root=cubes_root)
 
     def get_cube(self, request, cube_name):
         self.initialize_slicer()
