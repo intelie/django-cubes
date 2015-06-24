@@ -73,7 +73,7 @@ class CubesView(APIView):
         }
 
         cuts = []
-        for cut_string in request.query_params.getlist(argname):
+        for cut_string in request.QUERY_PARAMS.getlist(argname):
             cuts += cuts_from_string(
                 cube, cut_string, role_member_converters=converters
             )
@@ -110,16 +110,15 @@ class CubesView(APIView):
             logging.error(message)
             raise ParseError(detail=message)
 
-
     def _handle_pagination_and_order(self, request):
         try:
-            page = request.query_params.get('page', None)
+            page = request.QUERY_PARAMS.get('page', None)
         except ValueError:
             page = None
         request.page = page
 
         try:
-            page_size = request.query_params.get('pagesize', None)
+            page_size = request.QUERY_PARAMS.get('pagesize', None)
         except ValueError:
             page_size = None
         request.page_size = page_size
@@ -127,7 +126,7 @@ class CubesView(APIView):
         # Collect orderings:
         # order is specified as order=<field>[:<direction>]
         order = []
-        for orders in request.query_params.getlist('order'):
+        for orders in request.QUERY_PARAMS.getlist('order'):
             for item in orders.split(","):
                 split = item.split(":")
                 if len(split) == 1:
@@ -199,11 +198,11 @@ class CubeAggregation(CubesView):
 
         # Aggregates
         aggregates = []
-        for agg in request.query_params.getlist('aggregates') or []:
+        for agg in request.QUERY_PARAMS.getlist('aggregates') or []:
             aggregates += agg.split('|')
 
         drilldown = []
-        ddlist = request.query_params.getlist('drilldown')
+        ddlist = request.QUERY_PARAMS.getlist('drilldown')
         if ddlist:
             for ddstring in ddlist:
                 drilldown += ddstring.split('|')
@@ -296,7 +295,7 @@ class CubeFacts(CubesView):
         self.assert_enabled_action(request, browser, 'facts')
 
         # Construct the field list
-        fields_str = request.query_params.get('fields')
+        fields_str = request.QUERY_PARAMS.get('fields')
         if fields_str:
             attributes = cube.get_attributes(fields_str.split(','))
         else:
@@ -341,11 +340,11 @@ class CubeMembers(CubesView):
             logging.error(message)
             raise ParseError(detail=message)
 
-        hier_name = request.query_params.get('hierarchy')
+        hier_name = request.QUERY_PARAMS.get('hierarchy')
         hierarchy = dimension.hierarchy(hier_name)
 
-        depth = request.query_params.get('depth', None)
-        level = request.query_params.get('level', None)
+        depth = request.QUERY_PARAMS.get('depth', None)
+        level = request.QUERY_PARAMS.get('level', None)
 
         if depth and level:
             message = "Both depth and level provided, use only one (preferably level)"
