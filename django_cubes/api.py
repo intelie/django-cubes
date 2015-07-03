@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import re
 from collections import OrderedDict
 
 from rest_framework.views import APIView
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
 from rest_framework.renderers import TemplateHTMLRenderer
 
-from cubes import __version__, cut_from_dict
+from cubes import __version__, browser, cut_from_dict
 from cubes.workspace import Workspace, SLICER_INFO_KEYS
 from cubes.errors import NoSuchCubeError
 from cubes.calendar import CalendarMemberConverter
@@ -43,6 +44,21 @@ class ApiVersion(APIView):
 class CubesView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     workspace = None
+    SET_CUT_SEPARATOR_CHAR = '~'
+
+    def __init__(self, *args, **kwargs):
+        super(CubesView, self).__init__(*args, **kwargs)
+        self._fix_cut_separators()
+
+    def _fix_cut_separators(self):
+        browser.PATH_ELEMENT = r"(?:\\.|[^:%s|-])*" % self.SET_CUT_SEPARATOR_CHAR
+        browser.RE_ELEMENT = re.compile(r"^%s$" % browser.PATH_ELEMENT)
+        browser.RE_POINT = re.compile(r"^%s$" % browser.PATH_ELEMENT)
+        browser.SET_CUT_SEPARATOR_CHAR = self.SET_CUT_SEPARATOR_CHAR
+        browser.SET_CUT_SEPARATOR = re.compile(r'(?<!\\)%s' % self.SET_CUT_SEPARATOR_CHAR)
+        browser.RE_SET = re.compile(r"^(%s)(%s(%s))*$" % (
+            browser.PATH_ELEMENT, self.SET_CUT_SEPARATOR_CHAR, browser.PATH_ELEMENT
+        ))
 
     def initialize_slicer(self):
         if self.workspace is None:

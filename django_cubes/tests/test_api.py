@@ -324,6 +324,65 @@ class CubeAggregationAPI(BaseCubesAPITest):
             'levels': {'item': ['category', 'subcategory']}
         })
 
+    def test_multiple_drilldowns(self):
+        self.login()
+        base_url = reverse(self.url_name, kwargs=self.url_args)
+        path = "drilldown=year&drilldown=item&aggregates=amount_sum"
+        url = "%s?%s" % (base_url, path)
+        response = self.make_request(url)
+        self.assertEquals(response.status_code, 200)
+        content = load_json(response.content)
+        self.assertEquals(content, {
+            'aggregates': [u'amount_sum'],
+            'cell': [],
+            'cells': [
+                {u'amount_sum': 275420, u'item.category': u'a', u'item.category_label': u'Assets', u'year': 2009},
+                {u'amount_sum': 40037, u'item.category': u'e', u'item.category_label': u'Equity', u'year': 2009},
+                {u'amount_sum': 235383, u'item.category': u'l', u'item.category_label': u'Liabilities', u'year': 2009},
+                {u'amount_sum': 283010, u'item.category': u'a', u'item.category_label': u'Assets', u'year': 2010},
+                {u'amount_sum': 37555, u'item.category': u'e', u'item.category_label': u'Equity', u'year': 2010},
+                {u'amount_sum': 245455, u'item.category': u'l', u'item.category_label': u'Liabilities', u'year': 2010}
+            ],
+            'levels': {u'item': [u'category'], u'year': [u'year']},
+            'remainder': {},
+            'summary': {u'amount_sum': 1116860},
+            'total_cell_count': 6
+        })
+
+    def test_multiple_drilldowns_with_set_cuts(self):
+        self.login()
+        base_url = reverse(self.url_name, kwargs=self.url_args)
+        path = "drilldown=year&drilldown=item&aggregates=amount_sum&cut=item.category:a~e~l|year:2009~2010"
+        url = "%s?%s" % (base_url, path)
+        response = self.make_request(url)
+        self.assertEquals(response.status_code, 200)
+        content = load_json(response.content)
+        self.assertEquals(content, {
+            'aggregates': [u'amount_sum'],
+            'cell': [
+                {
+                    u'dimension': u'item', u'hidden': False, u'hierarchy': u'default',
+                    u'invert': False, u'level_depth': 1, u'paths': [[u'a'], [u'e'], [u'l']], u'type': u'set'
+                },
+                {
+                    u'dimension': u'year', u'hidden': False, u'hierarchy': u'default',
+                    u'invert': False, u'level_depth': 1, u'paths': [[u'2009'], [u'2010']], u'type': u'set'
+                }
+            ],
+            'cells': [
+                {u'amount_sum': 275420, u'item.category': u'a', u'item.category_label': u'Assets', u'year': 2009},
+                {u'amount_sum': 40037, u'item.category': u'e', u'item.category_label': u'Equity', u'year': 2009},
+                {u'amount_sum': 235383, u'item.category': u'l', u'item.category_label': u'Liabilities', u'year': 2009},
+                {u'amount_sum': 283010, u'item.category': u'a', u'item.category_label': u'Assets', u'year': 2010},
+                {u'amount_sum': 37555, u'item.category': u'e', u'item.category_label': u'Equity', u'year': 2010},
+                {u'amount_sum': 245455, u'item.category': u'l', u'item.category_label': u'Liabilities', u'year': 2010}
+            ],
+            'levels': {u'item': [u'category'], u'year': [u'year']},
+            'remainder': {},
+            'summary': {u'amount_sum': 1116860},
+            'total_cell_count': 6
+        })
+
     def test_drilldown_with_multiple_aggregates(self):
         self.login()
         base_url = reverse(self.url_name, kwargs=self.url_args)

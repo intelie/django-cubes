@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import six
 from os import path
-from cubes import Workspace, Cell, PointCut
+from cubes import Workspace, Cell, PointCut, SetCut
 
+from unittest import skip
 from django.test import TransactionTestCase
 from django.conf import settings
 
@@ -151,4 +152,42 @@ class ValidateDjangoOrmBrowser(TransactionTestCase):
                 'year': 2010,
                 'item.line_item': u'All'
             },
+        ])
+
+    def test_multiple_drilldowns(self):
+        # "?drilldown=year&drilldown=item&aggregates=amount_sum"
+        result = self.browser.aggregate(drilldown=["year", "item"], aggregates=["amount_sum"])
+        values = [
+            (row.label, row.record)
+            for row in result.table_rows("item")
+        ]
+        six.assertCountEqual(self, values, [
+            ('Assets', {'amount_sum': 275420, 'item.category': 'a', 'item.category_label': 'Assets', 'year': 2009}),
+            ('Equity', {'amount_sum': 40037, 'item.category': 'e', 'item.category_label': 'Equity', 'year': 2009}),
+            ('Liabilities', {'amount_sum': 235383, 'item.category': 'l', 'item.category_label': 'Liabilities', 'year': 2009}),
+            ('Assets', {'amount_sum': 283010, 'item.category': 'a', 'item.category_label': 'Assets', 'year': 2010}),
+            ('Equity', {'amount_sum': 37555, 'item.category': 'e', 'item.category_label': 'Equity', 'year': 2010}),
+            ('Liabilities', {'amount_sum': 245455, 'item.category': 'l', 'item.category_label': 'Liabilities', 'year': 2010})
+        ])
+
+    @skip('SetCuts are not yet supported by this backend')
+    def test_multiple_drilldowns_with_set_cuts(self):
+        # "?drilldown=year&drilldown=item&aggregates=amount_sum&cut=item.category:a;e;l|year:2009;2010"
+        cuts = [
+            SetCut("item", [['a'], ['e'], ['l']]),
+            SetCut("year", [[2009], [2010]]),
+        ]
+        cell = Cell(self.browser.cube, cuts=cuts)
+        result = self.browser.aggregate(cell, drilldown=["year", "item"], aggregates=["amount_sum"])
+        values = [
+            (row.label, row.record)
+            for row in result.table_rows("item")
+        ]
+        six.assertCountEqual(self, values, [
+            ('Assets', {'amount_sum': 275420, 'item.category': 'a', 'item.category_label': 'Assets', 'year': 2009}),
+            ('Equity', {'amount_sum': 40037, 'item.category': 'e', 'item.category_label': 'Equity', 'year': 2009}),
+            ('Liabilities', {'amount_sum': 235383, 'item.category': 'l', 'item.category_label': 'Liabilities', 'year': 2009}),
+            ('Assets', {'amount_sum': 283010, 'item.category': 'a', 'item.category_label': 'Assets', 'year': 2010}),
+            ('Equity', {'amount_sum': 37555, 'item.category': 'e', 'item.category_label': 'Equity', 'year': 2010}),
+            ('Liabilities', {'amount_sum': 245455, 'item.category': 'l', 'item.category_label': 'Liabilities', 'year': 2010})
         ])
