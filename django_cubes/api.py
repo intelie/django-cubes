@@ -2,6 +2,7 @@
 import logging
 import re
 from collections import OrderedDict
+from threading import local
 
 from rest_framework.views import APIView
 from rest_framework import permissions
@@ -27,6 +28,19 @@ __all__ = [
     'CubeCell', 'CubeReport', 'CubeFacts',
     'CubeFact', 'CubeMembers',
 ]
+
+
+data = local()
+
+
+def create_local_workspace(config, cubes_root):
+    """
+    Returns or creates a thread-local instance of Workspace
+    """
+    if not hasattr(data, 'workspace'):
+        data.workspace = Workspace(config=config, cubes_root=cubes_root)
+
+    return data.workspace
 
 
 class ApiVersion(APIView):
@@ -68,7 +82,7 @@ class CubesView(APIView):
             except AttributeError:
                 raise ImproperlyConfigured('settings.SLICER_CONFIG_FILE and settings.SLICER_MODELS_DIR are not set.')
 
-            self.workspace = Workspace(config=config, cubes_root=cubes_root)
+            self.workspace = create_local_workspace(config=config, cubes_root=cubes_root)
 
     def get_cube(self, request, cube_name):
         self.initialize_slicer()
