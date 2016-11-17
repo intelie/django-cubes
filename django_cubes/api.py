@@ -279,7 +279,6 @@ class CubeReport(CubesView):
     def make_report(self, request, cube_name):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
-        self.assert_enabled_action(request, browser, 'report')
 
         report_request = request.DATA
         try:
