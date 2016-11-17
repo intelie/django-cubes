@@ -4,7 +4,7 @@ from mock import Mock, patch
 from django.test import TransactionTestCase
 from django.contrib.auth import get_user_model
 
-from cubes.backends.sql.browser import SnowflakeBrowser, available_aggregate_functions, available_calculators
+from cubes.sql.browser import SQLBrowser as  SnowflakeBrowser, available_aggregate_functions, available_calculators
 from rest_framework.reverse import reverse
 
 User = get_user_model()

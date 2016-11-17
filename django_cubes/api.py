@@ -11,6 +11,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from cubes import __version__, browser, cut_from_dict
+from cubes.server.base import read_slicer_config
 from cubes.workspace import Workspace, SLICER_INFO_KEYS
 from cubes.errors import NoSuchCubeError
 from cubes.calendar import CalendarMemberConverter
@@ -36,8 +37,10 @@ data = local()
 def create_local_workspace(config, cubes_root):
     """
     Returns or creates a thread-local instance of Workspace
+    config - path (str)
     """
     if not hasattr(data, 'workspace'):
+        config = read_slicer_config(config)
         data.workspace = Workspace(config=config, cubes_root=cubes_root)
 
     return data.workspace
@@ -331,7 +334,7 @@ class CubeFacts(CubesView):
         else:
             attributes = cube.all_attributes
 
-        fields = [attr.ref() for attr in attributes]
+        fields = [attr.ref for attr in attributes]
         cell = self.get_cell(request, cube, restrict=True)
 
         # Get the result

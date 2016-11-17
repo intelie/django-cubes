@@ -1,4 +1,4 @@
 django<1.8
-cubes==1.0.1
+cubes==1.1
 six>=1.8.0
 djangorestframework>=2.3.14

@@ -11,6 +11,8 @@ from django.conf import settings
 from django_cubes.backends.django_orm.browser import DjangoBrowser  # NOQA
 from django_cubes.backends.django_orm.store import DjangoStore  # NOQA
 
+from cubes.server.base import read_slicer_config
+
 __all__ = ['ValidateDjangoOrmBrowser']
 
 
@@ -22,7 +24,7 @@ class ValidateDjangoOrmBrowser(TransactionTestCase):
         super(ValidateDjangoOrmBrowser, self).setUp()
         self.workspace = Workspace(
             cubes_root=settings.SLICER_MODELS_DIR,
-            config=path.join(settings.SLICER_MODELS_DIR, 'slicer-django_backend.ini'),
+            config=read_slicer_config(path.join(settings.SLICER_MODELS_DIR, 'slicer-django_backend.ini'))
         )
         self.browser = self.workspace.browser("irbd_balance")
 
