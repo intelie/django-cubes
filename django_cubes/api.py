@@ -68,13 +68,14 @@ class CubesView(APIView):
         self._fix_cut_separators()
 
     def _fix_cut_separators(self):
-        browser.PATH_ELEMENT = r"(?:\\.|[^:%s|-])*" % self.SET_CUT_SEPARATOR_CHAR
-        browser.RE_ELEMENT = re.compile(r"^%s$" % browser.PATH_ELEMENT)
-        browser.RE_POINT = re.compile(r"^%s$" % browser.PATH_ELEMENT)
-        browser.SET_CUT_SEPARATOR_CHAR = self.SET_CUT_SEPARATOR_CHAR
-        browser.SET_CUT_SEPARATOR = re.compile(r'(?<!\\)%s' % self.SET_CUT_SEPARATOR_CHAR)
-        browser.RE_SET = re.compile(r"^(%s)(%s(%s))*$" % (
-            browser.PATH_ELEMENT, self.SET_CUT_SEPARATOR_CHAR, browser.PATH_ELEMENT
+        from cubes import cells
+        cells.PATH_ELEMENT = r"(?:\\.|[^:%s|-])*" % self.SET_CUT_SEPARATOR_CHAR
+        cells.RE_ELEMENT = re.compile(r"^%s$" % cells.PATH_ELEMENT)
+        cells.RE_POINT = re.compile(r"^%s$" % cells.PATH_ELEMENT)
+        cells.SET_CUT_SEPARATOR_CHAR = self.SET_CUT_SEPARATOR_CHAR
+        cells.SET_CUT_SEPARATOR = re.compile(r'(?<!\\)%s' % self.SET_CUT_SEPARATOR_CHAR)
+        cells.RE_SET = re.compile(r"^(%s)(%s(%s))*$" % (
+            cells.PATH_ELEMENT, self.SET_CUT_SEPARATOR_CHAR, cells.PATH_ELEMENT
         ))
 
     def initialize_slicer(self):
