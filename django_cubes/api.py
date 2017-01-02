@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
 from rest_framework.renderers import TemplateHTMLRenderer
 
-from cubes import __version__, browser, cut_from_dict
+from cubes import __version__, browser, cut_from_dict, compat
 from cubes.server.base import read_slicer_config
 from cubes.workspace import Workspace, SLICER_INFO_KEYS
 from cubes.errors import NoSuchCubeError
@@ -20,6 +20,8 @@ from cubes.browser import Cell, cuts_from_string
 from django.conf import settings
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured
+
+
 
 API_VERSION = 2
 
@@ -32,6 +34,25 @@ __all__ = [
 
 
 data = local()
+
+
+def to_unicode(s):
+    if isinstance(s, unicode):
+        return s
+
+    s = str(s.__str__().encode('utf-8','ignore'))
+
+    for enc in ('utf8', 'latin-1'):
+        try:
+            return unicode(s, enc)
+        except UnicodeDecodeError:
+            pass
+
+    raise ValueError("Cannot decode for unicode using any of the default "
+                     "encodings: %s" % s)
+
+# PATCH cubes
+compat.to_unicode = to_unicode
 
 
 def create_local_workspace(config, cubes_root):
@@ -111,6 +132,7 @@ class CubesView(APIView):
             cuts += cuts_from_string(
                 cube, cut_string, role_member_converters=converters
             )
+
 
         if cuts:
             cell = Cell(cube, cuts)
