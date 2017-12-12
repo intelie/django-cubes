@@ -143,7 +143,7 @@ class CubesView(APIView):
                 )
         else:
             cut_string = requested_cubes.get(argname, '')
-            cut_string = urllib.unquote(cut_string).encode('utf8').decode('utf8')
+            cut_string = urllib.unquote(cut_string).encode('latin1').decode('utf8')
             cuts = cuts_from_string(
                 cube, cut_string, role_member_converters=converters
             )
