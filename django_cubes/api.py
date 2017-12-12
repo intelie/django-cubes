@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import re
+import urllib
 from collections import OrderedDict
 from threading import local
 
@@ -121,18 +122,31 @@ class CubesView(APIView):
     def get_browser(self, cube):
         return self.workspace.browser(cube)
 
-    def get_cell(self, request, cube, argname="cut", restrict=False):
+    def get_cell(self, request, cube, argname="cut", restrict=False, request_method='GET'):
         """Returns a `Cell` object from argument with name `argname`"""
+        request_args = {
+            'GET': 'QUERY_PARAMS',
+            'POST': 'DATA',
+        }
+
         converters = {
             "time": CalendarMemberConverter(self.workspace.calendar)
         }
 
         cuts = []
-        for cut_string in request.QUERY_PARAMS.getlist(argname):
-            cuts += cuts_from_string(
+        requested_cubes = getattr(request, request_args[request_method])
+
+        if request_method == 'GET':
+            for cut_string in requested_cubes.getlist(argname):
+                cuts += cuts_from_string(
+                    cube, cut_string, role_member_converters=converters
+                )
+        else:
+            cut_string = requested_cubes.get(argname, '')
+            cut_string = urllib.unquote(cut_string).encode('utf8').decode('utf8')
+            cuts = cuts_from_string(
                 cube, cut_string, role_member_converters=converters
             )
-
 
         if cuts:
             cell = Cell(cube, cuts)
@@ -246,24 +260,41 @@ class CubeModel(CubesView):
 class CubeAggregation(CubesView):
 
     def get(self, request, cube_name):
+        return self.build_response(request, cube_name, request_method='GET')
+
+    def post(self, request, cube_name):
+        return self.build_response(request, cube_name, request_method='POST')
+
+    def get_value_list(self, request, argname, request_method='GET'):
+        values = []
+
+        if request_method == 'GET':
+            arg_source = request.QUERY_PARAMS
+            raw_list = arg_source.getlist(argname)
+            if raw_list:
+                values.extend(
+                    item.split('|') for item in raw_list
+                )
+        else:
+            arg_source = request.DATA
+            raw_list = arg_source.get(argname, '')
+            values = [
+                item for item in urllib.unquote(raw_list).encode('utf8').split('|')
+                if item
+            ]
+
+        return values
+
+    def build_response(self, request, cube_name, request_method='GET'):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
         self.assert_enabled_action(request, browser, 'aggregate')
 
-        cell = self.get_cell(request, cube, restrict=True)
+        cell = self.get_cell(request, cube, restrict=True, request_method=request_method)
+        aggregates = self.get_value_list(request, 'aggregates', request_method=request_method)
+        drilldown = self.get_value_list(request, 'drilldown',  request_method=request_method)
 
-        # Aggregates
-        aggregates = []
-        for agg in request.QUERY_PARAMS.getlist('aggregates') or []:
-            aggregates += agg.split('|')
-
-        drilldown = []
-        ddlist = request.QUERY_PARAMS.getlist('drilldown')
-        if ddlist:
-            for ddstring in ddlist:
-                drilldown += ddstring.split('|')
-
-        split = self.get_cell(request, cube, argname='split')
+        split = self.get_cell(request, cube, argname='split', request_method=request_method)
         result = browser.aggregate(
             cell,
             aggregates=aggregates,
@@ -345,19 +376,29 @@ class CubeReport(CubesView):
 class CubeFacts(CubesView):
 
     def get(self, request, cube_name):
+        return self.build_response(request, cube_name, request_method='GET')
+
+    def post(self, request, cube_name):
+        return self.build_response(request, cube_name, request_method='POST')
+
+    def build_response(self, request, cube_name, request_method='GET'):
         cube = self.get_cube(request, cube_name)
         browser = self.get_browser(cube)
         self.assert_enabled_action(request, browser, 'facts')
 
         # Construct the field list
-        fields_str = request.QUERY_PARAMS.get('fields')
+        if request_method == 'GET':
+            fields_str = request.QUERY_PARAMS.get('fields')
+        else:
+          fields_str = request.DATA.get('fields')
+
         if fields_str:
             attributes = cube.get_attributes(fields_str.split(','))
         else:
             attributes = cube.all_attributes
 
         fields = [attr.ref for attr in attributes]
-        cell = self.get_cell(request, cube, restrict=True)
+        cell = self.get_cell(request, cube, restrict=True, request_method=request_method)
 
         # Get the result
         facts = browser.facts(
